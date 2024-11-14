@@ -1,3 +1,4 @@
+// src/server.js
 const Hapi = require('@hapi/hapi');
 const routes = require('./routes/books');  // Import routes dari books.js
 
@@ -8,14 +9,16 @@ const init = async () => {
     });
 
     server.route(routes);  // Menghubungkan route ke server
-
-    await server.start();
-    console.log('Server running on %s', server.info.uri);
+    return server;  // Mengembalikan server tanpa memulai server
 };
 
-process.on('unhandledRejection', (err) => {
-    console.log(err);
-    process.exit(1);
-});
+// Menjalankan server jika file ini dieksekusi secara langsung
+if (require.main === module) {
+    (async () => {
+        const server = await init();
+        await server.start();
+        console.log('Server running on %s', server.info.uri);
+    })();
+}
 
-init();
+module.exports = init;
